@@ -8,16 +8,9 @@ const gameDataRoute = require("./routes/gameData");
 const cors = require("cors");
 
 app.use(bodyParser.json());
-
-//Middleware
 app.use(cors());
 app.use("/login", loginRoute);
 app.use("/gameData", gameDataRoute);
-
-//ROUTES
-app.get("/", (req, res) => {
-  res.send("We are on home");
-});
 
 // Connect to DB
 mongoose.connect(
