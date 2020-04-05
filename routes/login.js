@@ -13,9 +13,9 @@ router.get("/", async (req, res) => {
 });
 
 // Gets a specific user login data
-router.get("/:userId", async (req, res) => {
+router.get("/:username", async (req, res) => {
   try {
-    const login = await Login.findById(req.params.userId);
+    const login = await Login.findOne({ username: req.params.username });
     res.json(login);
   } catch (err) {
     res.json({ message: err.message, stack: err.stack });
@@ -47,18 +47,5 @@ router.delete("/:userId", async (req, res) => {
     res.json({ message: err.message, stack: err.stack });
   }
 });
-
-// Update a specific user
-// router.patch("/:userId", async (req, res) => {
-//   try {
-//     const updatedUserData = await Login.updateOne(
-//       { _id: req.params.userId },
-//       { $set: { password: req.body.password } }
-//     );
-//     res.json(updatedUserData);
-//   } catch (err) {
-//     res.json({ message: err.message, stack: err.stack });
-//   }
-// });
 
 module.exports = router;

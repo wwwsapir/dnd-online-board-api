@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
 // Gets a specific user login data by the user id
 router.get("/:userId", async (req, res) => {
   try {
-    const gameData = await Login.find({ userId: req.params.userId });
+    const gameData = await Login.findOne({ userId: req.params.userId });
     res.json(gameData);
   } catch (err) {
     res.json({ message: err.message, stack: err.stack });
