@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const GameData = require("../models/GameData");
+const verify = require("./verifyToken");
 
 // Gets all users saved game data
-router.get("/", async (req, res) => {
+router.get("/", verify, async (req, res) => {
   try {
     const gamesData = await GameData.find();
     res.json(gamesData);
@@ -13,7 +14,7 @@ router.get("/", async (req, res) => {
 });
 
 // Gets a specific user login data by the user id
-router.get("/:userId", async (req, res) => {
+router.get("/:userId", verify, async (req, res) => {
   try {
     const gameData = await Login.findOne({ userId: req.params.userId });
     res.json(gameData);
@@ -23,7 +24,7 @@ router.get("/:userId", async (req, res) => {
 });
 
 // Records a saved game data
-router.post("/", async (req, res) => {
+router.post("/", verify, async (req, res) => {
   const gameData = new Login({
     userId: req.body.userId,
     gameState: req.body.gameState,
@@ -38,7 +39,7 @@ router.post("/", async (req, res) => {
 });
 
 // Deletes an existing game data
-router.delete("/:userId", async (req, res) => {
+router.delete("/:userId", verify, async (req, res) => {
   try {
     const deletedGameData = await Login.remove({ userId: req.params.userId });
     res.json(deletedGameData);
@@ -48,7 +49,7 @@ router.delete("/:userId", async (req, res) => {
 });
 
 // Update a specific game data
-router.patch("/:userId", async (req, res) => {
+router.patch("/:userId", verify, async (req, res) => {
   try {
     const updatedGameData = await Login.updateOne(
       { userId: req.params.userId },
