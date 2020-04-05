@@ -1,14 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const Login = require("../models/Login");
-const Register = require("../models/Register");
+const User = require("../models/User");
 const { registerValidation, loginValidation } = require("../validation");
 
-// Gets all users login data (for debug purposes)
+// Gets all users data (for debug purposes)
 router.get("/", async (req, res) => {
   try {
-    const logins = await Login.find();
-    res.json(logins);
+    const users = await User.find();
+    res.json(users);
   } catch {
     res.json({ message: err.message, stack: err.stack });
   }
@@ -24,8 +23,8 @@ router.get("/login/:username", async (req, res) => {
   }
 
   try {
-    const login = await Login.findOne({ username: req.params.username });
-    res.json(login);
+    const user = await User.findOne({ username: req.params.username });
+    res.json(user);
   } catch (err) {
     res.json({ message: err.message, stack: err.stack });
   }
@@ -40,14 +39,20 @@ router.post("/register", async (req, res) => {
     return res.status(400).send(errMessage);
   }
 
-  const register = new Register({
+  // Checking if the user already exists
+  const user = await User.findOne({ email: req.params.email });
+  if (user) {
+    return res.status(400).send("Email already registered");
+  }
+
+  const newUser = new User({
     username: req.body.username,
     password: req.body.password,
     email: req.body.email,
   });
 
   try {
-    const savedUser = await register.save();
+    const savedUser = await newUser.save();
     res.json(savedUser);
   } catch (err) {
     res.json({ message: err.message, stack: err.stack });
@@ -57,7 +62,7 @@ router.post("/register", async (req, res) => {
 // Deletes a user
 router.delete("/:userId", async (req, res) => {
   try {
-    const deletedUser = await Login.remove({ _id: req.params.userId });
+    const deletedUser = await User.remove({ _id: req.params.userId });
     res.json(deletedUser);
   } catch (err) {
     res.json({ message: err.message, stack: err.stack });
