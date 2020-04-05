@@ -1,0 +1,36 @@
+const express = require("express");
+const app = express();
+const mongoose = require("mongoose");
+require("dotenv/config");
+const bodyParser = require("body-parser");
+const loginRoute = require("./routes/login");
+const gameDataRoute = require("./routes/gameData");
+const cors = require("cors");
+
+app.use(bodyParser.json());
+
+//Middleware
+app.use(cors());
+app.use("/login", loginRoute);
+app.use("/gameData", gameDataRoute);
+
+//ROUTES
+app.get("/", (req, res) => {
+  res.send("We are on home");
+});
+
+// Connect to DB
+mongoose.connect(
+  process.env.DB_CONNECTION_URL,
+  { useNewUrlParser: true, useUnifiedTopology: true },
+  (err) => {
+    if (err) {
+      console.log("Connection errors:", err);
+    } else {
+      console.log("Connected to DB!");
+    }
+  }
+);
+
+// Start to listen
+app.listen(9000);
