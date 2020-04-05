@@ -3,13 +3,13 @@ const app = express();
 const mongoose = require("mongoose");
 require("dotenv/config");
 const bodyParser = require("body-parser");
-const loginRoute = require("./routes/login");
+const authRoute = require("./routes/auth");
 const gameDataRoute = require("./routes/gameData");
 const cors = require("cors");
 
 app.use(bodyParser.json());
 app.use(cors());
-app.use("/login", loginRoute);
+app.use("/auth", authRoute);
 app.use("/gameData", gameDataRoute);
 
 // Connect to DB

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const LoginSchema = mongoose.Schema({
+const RegisterSchema = mongoose.Schema({
   username: {
     type: String,
     required: true,
@@ -13,7 +13,13 @@ const LoginSchema = mongoose.Schema({
     min: 6,
     max: 1024,
   },
+  email: {
+    type: String,
+    required: true,
+    min: 6,
+    max: 255,
+  },
   date: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model("Login", LoginSchema);
+module.exports = mongoose.model("Register", RegisterSchema);
