@@ -33,12 +33,12 @@ router.post("/login", async (req, res) => {
   const { error } = loginValidation(req.body);
   if (error) {
     const errMessage = error.details[0].message;
-    return res.status(400).send(errMessage);
+    return res.status(400).json(errMessage);
   }
 
   try {
     const user = await User.findOne({ email: req.body.email });
-    if (!user) return res.status(400).send("Email or password are invalid");
+    if (!user) return res.status(400).json("Email or password are invalid");
 
     const passwordValid = await bcrypt.compare(
       req.body.password,
@@ -46,7 +46,7 @@ router.post("/login", async (req, res) => {
     );
     console.log(passwordValid);
     if (!passwordValid)
-      return res.status(400).send("Email or password are invalid");
+      return res.status(400).json("Email or password are invalid");
 
     // Create and assign a token
     const token = jwt.sign({ _id: user._id }, process.env.TOKEN_ADDITION);
@@ -64,12 +64,12 @@ router.post("/register", async (req, res) => {
   const { error } = registerValidation(req.body);
   if (error) {
     const errMessage = error.details[0].message;
-    return res.status(400).send(errMessage);
+    return res.status(400).json(errMessage);
   }
 
   // Checking if the user already exists
   const emailExists = await User.findOne({ email: req.body.email });
-  if (emailExists) return res.status(400).send("Email already registered");
+  if (emailExists) return res.status(400).json("Email already registered");
 
   // Hash the password
   const salt = await bcrypt.genSalt(10);
