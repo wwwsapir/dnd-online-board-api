@@ -49,10 +49,12 @@ router.delete("/delete/", verify, async (req, res) => {
     if (deletedGameData.deletedCount === 1) {
       res.status(200).json("Deleted Successfully");
     } else {
-      res.status(400).json("Couldn't find game data to delete");
+      res
+        .status(400)
+        .json({ error: { message: "Couldn't find game data to delete" } });
     }
   } catch (err) {
-    res.json({ error: { message: err.message, stack: err.stack } });
+    res.status(400).json({ error: { message: err.message, stack: err.stack } });
   }
 });
 
