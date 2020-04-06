@@ -17,9 +17,9 @@ const verify = require("./verifyToken");
 router.get("/:userId", verify, async (req, res) => {
   try {
     const gameData = await GameData.findOne({ userId: req.params.userId });
-    res.json(gameData);
+    res.status(200).json(gameData);
   } catch (err) {
-    res.json({ error: { message: err.message, stack: err.stack } });
+    res.status(400).json({ error: { message: err.message, stack: err.stack } });
   }
 });
 
@@ -32,9 +32,9 @@ router.post("/", verify, async (req, res) => {
 
   try {
     const savedUserLogin = await gameData.save();
-    res.json(savedUserLogin);
+    res.status(200).json(savedUserLogin);
   } catch (err) {
-    res.json({ error: { message: err.message, stack: err.stack } });
+    res.status(400).json({ error: { message: err.message, stack: err.stack } });
   }
 });
 
@@ -59,9 +59,9 @@ router.patch("/:userId", verify, async (req, res) => {
       { userId: req.params.userId },
       { $set: { gameState: req.body.gameState } }
     );
-    res.json(updatedGameData);
+    res.status(200).json(updatedGameData);
   } catch (err) {
-    res.json({ error: { message: err.message, stack: err.stack } });
+    res.status(400).json({ error: { message: err.message, stack: err.stack } });
   }
 });
 
