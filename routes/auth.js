@@ -33,27 +33,26 @@ router.post("/login", async (req, res) => {
   const { error } = loginValidation(req.body);
   if (error) {
     const errMessage = error.details[0].message;
-    return res.status(400).json(errMessage);
+    return res.status(400).json({ error: { message: errMessage } });
   }
+
+  const generic_error = { error: { message: "Email or password are invalid" } };
 
   try {
     const user = await User.findOne({ email: req.body.email });
-    if (!user) return res.status(400).json("Email or password are invalid");
+    if (!user) return res.status(400).json(generic_error);
 
     const passwordValid = await bcrypt.compare(
       req.body.password,
       user.password
     );
-    if (!passwordValid)
-      return res.status(400).json("Email or password are invalid");
+    if (!passwordValid) return res.status(400).json(generic_error);
 
     // Create and assign a token
     const token = jwt.sign({ _id: user._id }, process.env.TOKEN_ADDITION);
-    res
-      .header("auth-token", token)
-      .json({ userId: user._id, userName: user.username });
+    res.json({ userId: user._id, userName: user.userName, authToken: token });
   } catch (err) {
-    res.json({ message: err.message, stack: err.stack });
+    res.json({ error: { message: err.message, stack: err.stack } });
   }
 });
 
@@ -61,14 +60,18 @@ router.post("/login", async (req, res) => {
 router.post("/register", async (req, res) => {
   // Validating before register
   const { error } = registerValidation(req.body);
+  console.log(error);
   if (error) {
     const errMessage = error.details[0].message;
-    return res.status(400).json(errMessage);
+    return res.status(400).json({ error: { message: errMessage } });
   }
 
   // Checking if the user already exists
   const emailExists = await User.findOne({ email: req.body.email });
-  if (emailExists) return res.status(400).json("Email already registered");
+  if (emailExists)
+    return res
+      .status(400)
+      .json({ error: { message: "Email already registered" } });
 
   // Hash the password
   const salt = await bcrypt.genSalt(10);
@@ -76,16 +79,16 @@ router.post("/register", async (req, res) => {
 
   // Create a new user
   const newUser = new User({
-    username: req.body.username,
+    userName: req.body.userName,
     password: hashedPassword,
     email: req.body.email,
   });
 
   try {
-    const savedUser = await newUser.save();
-    res.json({ userId: savedUser._id, userName: savedUser.username });
+    await newUser.save();
+    res.json("Registered successfuly!");
   } catch (err) {
-    res.json({ message: err.message, stack: err.stack });
+    res.json({ error: { message: err.message, stack: err.stack } });
   }
 });
 
