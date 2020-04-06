@@ -5,28 +5,6 @@ const { registerValidation, loginValidation } = require("../validation");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-// Gets all users data (for debug purposes)
-router.get("/", async (req, res) => {
-  try {
-    const users = await User.find();
-    res.json(users);
-  } catch {
-    res.json({ message: err.message, stack: err.stack });
-  }
-});
-
-// Verify user exists (forgot password?)
-router.post("/", async (req, res) => {
-  try {
-    const user = await User.findOne({ email: req.body.email });
-    if (user) {
-      console.log("Should send an email with the password");
-    }
-  } catch (err) {
-    res.json({ message: err.message, stack: err.stack });
-  }
-});
-
 // Login
 router.post("/login", async (req, res) => {
   // Validating before login
@@ -50,9 +28,11 @@ router.post("/login", async (req, res) => {
 
     // Create and assign a token
     const token = jwt.sign({ _id: user._id }, process.env.TOKEN_ADDITION);
-    res.json({ userId: user._id, userName: user.userName, authToken: token });
+    res
+      .status(200)
+      .json({ userId: user._id, userName: user.userName, authToken: token });
   } catch (err) {
-    res.json({ error: { message: err.message, stack: err.stack } });
+    res.status(400).json({ error: { message: err.message, stack: err.stack } });
   }
 });
 
@@ -86,20 +66,42 @@ router.post("/register", async (req, res) => {
 
   try {
     await newUser.save();
-    res.json("Registered successfuly!");
+    res.status(200).json("Registered successfuly!");
   } catch (err) {
-    res.json({ error: { message: err.message, stack: err.stack } });
+    res.status(400).json({ error: { message: err.message, stack: err.stack } });
+  }
+});
+
+// Verify user exists (forgot password?)
+router.post("/", async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (user) {
+      console.log("Should send an email with the password");
+    }
+  } catch (err) {
+    res.status(400).json({ error: { message: err.message, stack: err.stack } });
   }
 });
 
 // Deletes a user
-router.delete("/:userId", async (req, res) => {
-  try {
-    const deletedUser = await User.remove({ _id: req.params.userId });
-    res.json(deletedUser);
-  } catch (err) {
-    res.json({ message: err.message, stack: err.stack });
-  }
-});
+// router.delete("/delete/:userId", async (req, res) => {
+//   try {
+//     await User.remove({ _id: req.params.userId });
+//     res.status(200).json("User deleted successfuly!");
+//   } catch (err) {
+//     res.status(400).json({ error: { message: err.message, stack: err.stack } });
+//   }
+// });
+
+// Gets all users data (for debug purposes)
+// router.get("/", async (req, res) => {
+//   try {
+//     const users = await User.find();
+//     res.status(200).json(users);
+//   } catch {
+//     res.status(400).json({error: { message: err.message, stack: err.stack }});
+//   }
+// });
 
 module.exports = router;
