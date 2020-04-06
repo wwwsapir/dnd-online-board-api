@@ -3,16 +3,6 @@ const router = express.Router();
 const GameData = require("../models/GameData");
 const verify = require("./verifyToken");
 
-// Gets all users saved game data
-// router.get("/", verify, async (req, res) => {
-//   try {
-//     const gamesData = await GameData.find();
-//     res.json(gamesData);
-//   } catch {
-//     res.json({ error: { message: err.message, stack: err.stack } });
-//   }
-// });
-
 // Gets a specific user Game data by the user id
 router.get("/", verify, async (req, res) => {
   try {
@@ -20,7 +10,9 @@ router.get("/", verify, async (req, res) => {
     if (gameData) {
       res.status(200).json(gameData);
     } else {
-      res.status(400).json("Couldn't find game data to retrieve");
+      res
+        .status(400)
+        .json({ error: { message: "Couldn't find game data to retrieve" } });
     }
   } catch (err) {
     res.status(400).json({ error: { message: err.message, stack: err.stack } });
@@ -58,16 +50,26 @@ router.delete("/delete/", verify, async (req, res) => {
   }
 });
 
-// Update a specific game data
-// router.patch("/:userId", verify, async (req, res) => {
+// Update a specific user game data
+router.patch("/", verify, async (req, res) => {
+  try {
+    const updatedGameData = await GameData.updateOne(
+      { userId: req.user._id },
+      { $set: { gameState: req.body.gameState } }
+    );
+    res.status(200).json(updatedGameData);
+  } catch (err) {
+    res.status(400).json({ error: { message: err.message, stack: err.stack } });
+  }
+});
+
+// Gets all users saved game data
+// router.get("/", verify, async (req, res) => {
 //   try {
-//     const updatedGameData = await GameData.updateOne(
-//       { userId: req.params.userId },
-//       { $set: { gameState: req.body.gameState } }
-//     );
-//     res.status(200).json(updatedGameData);
-//   } catch (err) {
-//     res.status(400).json({ error: { message: err.message, stack: err.stack } });
+//     const gamesData = await GameData.find();
+//     res.json(gamesData);
+//   } catch {
+//     res.json({ error: { message: err.message, stack: err.stack } });
 //   }
 // });
 
