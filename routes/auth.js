@@ -100,4 +100,15 @@ router.delete("/:userId", async (req, res) => {
   }
 });
 
+// Reset password
+router.post("/reset_password/:email", async (req, res) => {
+  const email = req.body.email;
+  const user = User.findOne({ email: email });
+  if (!user) {
+    return res.send("Email is not registered");
+  }
+  resetPassword = ResetPassword.findOne({userId: user._id, status: 0});
+
+});
+
 module.exports = router;
