@@ -44,7 +44,6 @@ router.post("/login", async (req, res) => {
       req.body.password,
       user.password
     );
-    console.log(passwordValid);
     if (!passwordValid)
       return res.status(400).json("Email or password are invalid");
 
@@ -52,7 +51,7 @@ router.post("/login", async (req, res) => {
     const token = jwt.sign({ _id: user._id }, process.env.TOKEN_ADDITION);
     res
       .header("auth-token", token)
-      .json({ userId: savedUser._id, userName: savedUser.username });
+      .json({ userId: user._id, userName: user.username });
   } catch (err) {
     res.json({ message: err.message, stack: err.stack });
   }
