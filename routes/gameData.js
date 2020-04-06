@@ -14,10 +14,14 @@ const verify = require("./verifyToken");
 // });
 
 // Gets a specific user Game data by the user id
-router.get("/:userId", verify, async (req, res) => {
+router.get("/", verify, async (req, res) => {
   try {
-    const gameData = await GameData.findOne({ userId: req.params.userId });
-    res.status(200).json(gameData);
+    const gameData = await GameData.findOne({ userId: req.user._id });
+    if (gameData) {
+      res.status(200).json(gameData);
+    } else {
+      res.status(400).json("Couldn't find game data to retrieve");
+    }
   } catch (err) {
     res.status(400).json({ error: { message: err.message, stack: err.stack } });
   }
@@ -25,14 +29,14 @@ router.get("/:userId", verify, async (req, res) => {
 
 // Records a saved game data
 router.post("/", verify, async (req, res) => {
-  const gameData = new Login({
-    userId: req.body.userId,
+  const gameData = new GameData({
+    userId: req.user._id,
     gameState: req.body.gameState,
   });
 
   try {
-    const savedUserLogin = await gameData.save();
-    res.status(200).json(savedUserLogin);
+    const savedGameData = await gameData.save();
+    res.status(200).json(savedGameData);
   } catch (err) {
     res.status(400).json({ error: { message: err.message, stack: err.stack } });
   }
@@ -41,7 +45,7 @@ router.post("/", verify, async (req, res) => {
 // Deletes an existing game data
 router.delete("/delete/", verify, async (req, res) => {
   try {
-    const deletedGameData = await GameData.remove({ userId: req.body.userId });
+    const deletedGameData = await GameData.deleteOne({ userId: req.user._id });
     if (deletedGameData.deletedCount === 1) {
       res.status(200).json("Deleted Successfully");
     } else {
@@ -53,16 +57,16 @@ router.delete("/delete/", verify, async (req, res) => {
 });
 
 // Update a specific game data
-router.patch("/:userId", verify, async (req, res) => {
-  try {
-    const updatedGameData = await GameData.updateOne(
-      { userId: req.params.userId },
-      { $set: { gameState: req.body.gameState } }
-    );
-    res.status(200).json(updatedGameData);
-  } catch (err) {
-    res.status(400).json({ error: { message: err.message, stack: err.stack } });
-  }
-});
+// router.patch("/:userId", verify, async (req, res) => {
+//   try {
+//     const updatedGameData = await GameData.updateOne(
+//       { userId: req.params.userId },
+//       { $set: { gameState: req.body.gameState } }
+//     );
+//     res.status(200).json(updatedGameData);
+//   } catch (err) {
+//     res.status(400).json({ error: { message: err.message, stack: err.stack } });
+//   }
+// });
 
 module.exports = router;
