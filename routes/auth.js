@@ -40,7 +40,6 @@ router.post("/login", async (req, res) => {
 router.post("/register", async (req, res) => {
   // Validating before register
   const { error } = registerValidation(req.body);
-  console.log(error);
   if (error) {
     const errMessage = error.details[0].message;
     return res.status(400).json({ error: { message: errMessage } });
