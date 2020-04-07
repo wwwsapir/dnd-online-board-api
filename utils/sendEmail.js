@@ -35,10 +35,10 @@ const sendResetPasswordEmail = async (toEmail, resetPasswordToken, res) => {
       generateTextFromHTML: true,
       html:
         "<p>Please click this link to complete the password reset process: " +
-        process.env.HOME_URL +
-        "/reset_password/reset/:" +
+        process.env.FRONT_END_RESET_URL +
+        ":" +
         resetPasswordToken +
-        "<br></br> If you didn't ask for this email, please ignore it.</p>",
+        "<br></br><br></br> If you didn't request this email, please ignore it.</p>",
     };
 
     smtpTransport.sendMail(mailOptions, (err, response) => {
