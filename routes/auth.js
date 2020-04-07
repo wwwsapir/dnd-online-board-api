@@ -29,11 +29,13 @@ router.post("/login", async (req, res) => {
 
     // Create and assign a token
     const token = jwt.sign({ _id: user._id }, process.env.TOKEN_ADDITION);
-    res
+    return res
       .status(200)
       .json({ userId: user._id, userName: user.userName, authToken: token });
   } catch (err) {
-    res.status(400).json({ error: { message: err.message, stack: err.stack } });
+    return res
+      .status(400)
+      .json({ error: { message: err.message, stack: err.stack } });
   }
 });
 
@@ -66,9 +68,11 @@ router.post("/register", async (req, res) => {
 
   try {
     await newUser.save();
-    res.status(200).json("Registered successfuly!");
+    return res.status(200).json("Registered successfuly!");
   } catch (err) {
-    res.status(400).json({ error: { message: err.message, stack: err.stack } });
+    return res
+      .status(400)
+      .json({ error: { message: err.message, stack: err.stack } });
   }
 });
 
@@ -87,12 +91,16 @@ router.post("/reset_password/send", async (req, res) => {
         { _id: user._id },
         { $set: { resetPasswordToken: hashedToken } }
       );
-      sendResetPasswordEmail(user.email, resetToken);
+      await sendResetPasswordEmail(user.email, resetToken, res);
     } else {
-      res.status(400).json({ error: { message: "Email not registered" } });
+      return res
+        .status(400)
+        .json({ error: { message: "Email not registered" } });
     }
   } catch (err) {
-    res.status(400).json({ error: { message: err.message, stack: err.stack } });
+    return res
+      .status(400)
+      .json({ error: { message: err.message, stack: err.stack } });
   }
 });
 
