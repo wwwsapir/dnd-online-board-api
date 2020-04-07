@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const GameData = require("../models/GameData");
-const verify = require("./verifyToken");
+const verify = require("../utils/verifyToken");
 
 // Gets a specific user Game data by the user id
 router.get("/", verify, async (req, res) => {

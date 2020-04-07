@@ -4,6 +4,7 @@ const User = require("../models/User");
 const { registerValidation, loginValidation } = require("../validation");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { sendResetPasswordEmail } = require("../utils/sendEmail");
 
 // Login
 router.post("/login", async (req, res) => {
@@ -72,35 +73,27 @@ router.post("/register", async (req, res) => {
 });
 
 // Verify user exists (forgot password?)
-router.post("/", async (req, res) => {
+router.post("/reset_password/send", async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
     if (user) {
-      console.log("Should send an email with the password");
+      const resetToken = jwt.sign(
+        { _id: user._id, extra: user.password },
+        process.env.TOKEN_ADDITION
+      ); // previous password used so the reset token will be one time use
+      const salt = await bcrypt.genSalt(10);
+      const hashedToken = await bcrypt.hash(resetToken, salt);
+      await User.updateOne(
+        { _id: user._id },
+        { $set: { resetPasswordToken: hashedToken } }
+      );
+      sendResetPasswordEmail(user.email, resetToken);
+    } else {
+      res.status(400).json({ error: { message: "Email not registered" } });
     }
   } catch (err) {
     res.status(400).json({ error: { message: err.message, stack: err.stack } });
   }
 });
-
-// Deletes a user
-// router.delete("/delete/:userId", async (req, res) => {
-//   try {
-//     await User.remove({ _id: req.params.userId });
-//     res.status(200).json("User deleted successfuly!");
-//   } catch (err) {
-//     res.status(400).json({ error: { message: err.message, stack: err.stack } });
-//   }
-// });
-
-// Gets all users data (for debug purposes)
-// router.get("/", async (req, res) => {
-//   try {
-//     const users = await User.find();
-//     res.status(200).json(users);
-//   } catch {
-//     res.status(400).json({error: { message: err.message, stack: err.stack }});
-//   }
-// });
 
 module.exports = router;

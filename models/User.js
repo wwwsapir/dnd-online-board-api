@@ -20,6 +20,7 @@ const UserSchema = mongoose.Schema({
     max: 255,
   },
   date: { type: Date, default: Date.now },
+  resetPasswordToken: { type: String, required: false },
 });
 
 module.exports = mongoose.model("User", UserSchema);
