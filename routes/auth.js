@@ -23,7 +23,6 @@ router.get("/user/:authToken", async (req, res) => {
       req.params.authToken,
       user.resetPasswordToken
     );
-    console.log(tokenMatchesUser);
     if (!tokenMatchesUser) return res.status(400).json(genericError);
 
     return res.status(200).json("Token matches!");
