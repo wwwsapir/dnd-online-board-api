@@ -141,7 +141,6 @@ router.post("/reset_password/reset", async (req, res) => {
     const { error } = resetPasswordValidation(req.body);
     if (error) {
       const errMessage = error.details[0].message;
-      console.log("Joi message:", errMessage);
       return res.status(400).json({ error: { message: errMessage } });
     }
 
