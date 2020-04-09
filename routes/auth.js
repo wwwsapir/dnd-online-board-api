@@ -103,13 +103,13 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// Verify user exists (forgot password?)
+// Verify user exists (forgot password?) and send reset password email
 router.post("/reset_password/send", async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
     if (user) {
       const resetToken = jwt.sign(
-        { _id: user._id, extra: user.password },
+        { extra: user.password, _id: user._id },
         process.env.TOKEN_ADDITION
       ); // previous password used so the reset token will be one time use
       const salt = await bcrypt.genSalt(10);
