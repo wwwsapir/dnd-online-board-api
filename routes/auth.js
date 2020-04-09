@@ -6,6 +6,34 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { sendResetPasswordEmail } = require("../utils/sendEmail");
 
+// Check if authToken matches the passwordResetToken saved in user
+router.get("/user/:authToken", async (req, res) => {
+  const genericError = {
+    error: { message: "Token is Invalid. Cannot reset password." },
+  };
+
+  try {
+    const userId = jwt.verify(req.params.authToken, process.env.TOKEN_ADDITION)
+      ._id;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(400).json(genericError);
+
+    const tokenMatchesUser = await bcrypt.compare(
+      req.params.authToken,
+      user.resetPasswordToken
+    );
+    console.log(tokenMatchesUser);
+    if (!tokenMatchesUser) return res.status(400).json(genericError);
+
+    return res.status(200).json("Token matches!");
+  } catch (err) {
+    return res
+      .status(400)
+      .json({ error: { message: err.message, stack: err.stack } });
+  }
+});
+
 // Login
 router.post("/login", async (req, res) => {
   // Validating before login
@@ -107,8 +135,8 @@ router.post("/reset_password/send", async (req, res) => {
 // Reset user's password
 router.post("/reset_password/reset", async (req, res) => {
   try {
-    const verified = jwt.verify(req.body.authToken, process.env.TOKEN_ADDITION);
-    const userId = verified._id;
+    const userId = jwt.verify(req.body.authToken, process.env.TOKEN_ADDITION)
+      ._id;
 
     // Hash the new password
     const salt = await bcrypt.genSalt(10);
