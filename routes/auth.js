@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
-const { registerValidation, loginValidation } = require("../validation");
+const {
+  registerValidation,
+  loginValidation,
+  resetPasswordValidation,
+} = require("../validation");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { sendResetPasswordEmail } = require("../utils/sendEmail");
@@ -134,12 +138,15 @@ router.post("/reset_password/send", async (req, res) => {
 // Reset user's password
 router.post("/reset_password/reset", async (req, res) => {
   try {
+    const { error } = resetPasswordValidation(req.body);
+    if (error) {
+      const errMessage = error.details[0].message;
+      console.log("Joi message:", errMessage);
+      return res.status(400).json({ error: { message: errMessage } });
+    }
+
     const userId = jwt.verify(req.body.authToken, process.env.TOKEN_ADDITION)
       ._id;
-
-    // Hash the new password
-    const salt = await bcrypt.genSalt(10);
-    const hashedNewPassword = await bcrypt.hash(req.body.newPassword, salt);
 
     const genericError = { error: { message: "Sorry, someting went wrong." } };
 
@@ -152,10 +159,26 @@ router.post("/reset_password/reset", async (req, res) => {
     );
     if (!tokenMatchesUser) return res.status(400).json(genericError);
 
+    const passwordIdenticalToPrevious = await bcrypt.compare(
+      req.body.newPassword,
+      user.password
+    );
+    if (passwordIdenticalToPrevious)
+      return res.status(400).json({
+        error: {
+          message: "New password must be different from the current one.",
+        },
+      });
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedNewPassword = await bcrypt.hash(req.body.newPassword, salt);
+
     await User.updateOne(
       { _id: userId },
       { $set: { password: hashedNewPassword, resetPasswordToken: undefined } }
     );
+    return res.status(200).json("Password changed!");
   } catch (err) {
     return res
       .status(400)
