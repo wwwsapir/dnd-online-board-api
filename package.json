@@ -8,6 +8,10 @@
   },
   "author": "",
   "license": "ISC",
+  "engines": {
+    "npm": "6.13.4",
+    "node": "12.16.1"
+  },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
     "@sendgrid/mail": "^7.0.0",

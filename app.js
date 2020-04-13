@@ -21,6 +21,7 @@ mongoose.connect(
       console.log("Connection errors:", err);
     } else {
       console.log("Connected to DB!");
+      console.log("port:", process.env.PORT);
     }
   }
 );
