@@ -10,6 +10,17 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { sendResetPasswordEmail } = require("../utils/sendEmail");
 
+router.get("/", async (req, res) => {
+  try {
+    const users = await User.find({});
+    return res.status(200).json(users);
+  } catch (err) {
+    return res
+      .status(400)
+      .json({ error: { message: err.message, stack: err.stack } });
+  }
+});
+
 // Check if authToken matches the passwordResetToken saved in user
 router.get("/user/:authToken", async (req, res) => {
   const genericError = {
