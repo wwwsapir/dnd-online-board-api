@@ -4,8 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "heroku-postbuild": "npm install --prefix client && npm run build --prefix client"
+    "start": "node app.js"
   },
   "author": "Sapir Zeelon",
   "license": "ISC",

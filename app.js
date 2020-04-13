@@ -12,10 +12,6 @@ app.use(cors());
 app.use("/auth", authRoute);
 app.use("/gameData", gameDataRoute);
 
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static("build"));
-}
-
 // Connect to DB
 mongoose.connect(
   process.env.DB_CONNECTION_URL,
